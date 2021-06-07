@@ -168,6 +168,8 @@ def parse_user_event(
         user_record.metadata_multihash = metadata_multihash
     elif event_type == user_event_types_lookup["update_name"]:
         user_record.name = helpers.bytes32_to_str(event_args._name)
+        if user_record.name == 'break':
+            raise Exception('bad name is causing a break')
     elif event_type == user_event_types_lookup["update_location"]:
         user_record.location = helpers.bytes32_to_str(event_args._location)
     elif event_type == user_event_types_lookup["update_bio"]:
