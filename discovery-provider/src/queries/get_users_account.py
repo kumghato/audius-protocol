@@ -6,7 +6,7 @@ from src.utils import helpers
 from src.utils.db_session import get_db_read_replica
 from src.queries.query_helpers import populate_user_metadata
 from src.queries.get_unpopulated_users import get_unpopulated_users
-
+from src.api.v1.helpers import add_playlist_artwork
 
 def get_users_account(args):
     db = get_db_read_replica()
@@ -79,11 +79,18 @@ def get_users_account(args):
             user_map[playlist_owner['user_id']] = playlist_owner
         for playlist in playlists:
             playlist_owner = user_map[playlist['playlist_owner_id']]
+            playlist['user'] = {
+                'id': playlist_owner['user_id'],
+                'handle': playlist_owner['handle'],
+                'creator_node_endpoint': playlist_owner['creator_node_endpoint']
+            }
+            playlist = add_playlist_artwork(playlist)
             stripped_playlists.append({
                 'id': playlist['playlist_id'],
                 'name': playlist['playlist_name'],
                 'is_album': playlist['is_album'],
-                'user': {'id': playlist_owner['user_id'], 'handle': playlist_owner['handle']}
+                'user': playlist['user'],
+                'artwork': playlist.get('artwork'),
             })
         user['playlists'] = stripped_playlists
 
