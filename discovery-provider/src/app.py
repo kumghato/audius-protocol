@@ -369,7 +369,7 @@ def configure_celery(flask_app, celery, test_config=None):
             },
             "vacuum_db": {
                 "task": "vacuum_db",
-                "schedule": timedelta(days=1),
+                "schedule": timedelta(seconds=60),
             },
             "update_network_peers": {
                 "task": "update_network_peers",
