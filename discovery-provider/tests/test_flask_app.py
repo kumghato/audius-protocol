@@ -5,6 +5,7 @@ from src.utils.db_session import get_db
 from src.utils.config import config_files
 from .conftest import TEST_BROKER_URL, TEST_CONFIG_OVERRIDE
 
+print("Does nothing!")
 
 def test_creator_endpoint(app, client):
     """Ensure that the value returned from the exposed endpoint matches value in postgres"""
