@@ -76,13 +76,14 @@ def is_valid_oracle(address: str) -> bool:
     return address in oracle_addresses
 
 
-def sign_attestation(attestation_str: str, private_key: str):
+# Returns a tuple of (signature, recoveryId)
+def sign_attestation(attestation_str: str, private_key: str) -> Tuple[str, int]:
     to_sign_hash = Web3.keccak(text=attestation_str).hex()
     encoded_to_sign = encode_defunct(hexstr=to_sign_hash)
     signed_message = w3.eth.account.sign_message(
         encoded_to_sign, private_key=private_key
     )
-    return signed_message.signature.hex()
+    return (signed_message.signature.hex(), signed_message.v)
 
 
 def get_attestation(
@@ -94,7 +95,7 @@ def get_attestation(
     specifier: str,
 ):
     """
-    Returns a owner_wallet, signed_attestation tuple,
+    Returns an (owner_wallet, signed_attestation, recovery_id) tuple,
     or throws an error explaining why the attestation was
     not able to be created."""
     if not user_id or not challenge_id or not oracle_address:
@@ -158,7 +159,11 @@ def get_attestation(
         challenge_specifier=user_challenge.specifier,
     )
 
-    signed_attestation: str = sign_attestation(
+    signed_attestation = sign_attestation(
         repr(attestation), shared_config["delegate"]["private_key"]
     )
-    return (shared_config["delegate"]["owner_wallet"], signed_attestation)
+    return (
+        shared_config["delegate"]["owner_wallet"],
+        signed_attestation[0],
+        signed_attestation[1],
+    )
